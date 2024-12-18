@@ -5,8 +5,8 @@
 #include <string.h>
 #include <raylib.h>
 
-#include "board.h"
-#include "reachable.h"
+#include "game/board.h"
+#include "game/reachable.h"
 
 const int players = 2;
 const int playerColors[players] = {0, 3};
