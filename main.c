@@ -73,9 +73,6 @@ const struct Color colors[7] = {
 };
 
 struct Vector2 getPos(int row, int col) {
-    row -= offset;
-    col -= offset;
-
     struct Vector2 p;
     p.x = boardCenter.x + displayUnit * (col + 0.5f * row);
     p.y = boardCenter.y + displayUnit * triangleHeight * row;
