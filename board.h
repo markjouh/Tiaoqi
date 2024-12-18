@@ -80,3 +80,23 @@ const struct Coord corners[6][10] = {
         {7, 4}
     }
 };
+
+int board[width][width];
+
+void initBoard() {
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < width; j++) {
+            board[i][j] = -2;
+        }
+    }
+
+    for (int i = 0; i < numCenter; i++) {
+        board[center[i].x][center[i].y] = -1;
+    }
+
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 10; j++) {
+            board[corners[i][j].x][corners[i][j].y] = i;
+        }
+    }
+}

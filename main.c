@@ -6,27 +6,6 @@
 #include <raylib.h>
 
 #include "board.h"
-
-int board[width][width];
-
-void initBoard() {
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < width; j++) {
-            board[i][j] = -2;
-        }
-    }
-
-    for (int i = 0; i < numCenter; i++) {
-        board[center[i].x][center[i].y] = -1;
-    }
-
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 10; j++) {
-            board[corners[i][j].x][corners[i][j].y] = i;
-        }
-    }
-}
-
 #include "reachable.h"
 
 const int players = 2;
@@ -60,25 +39,15 @@ bool makeMove(int a, int b) {
     return true;
 }
 
-void cpuTurn() {
-    int ord[numSpaces];
-    for (int i = 0; i < numSpaces; i++) {
-        ord[i] = i;
-    }
-    srand(time(0));
-    for (int i = 1; i < numSpaces; i++) {
-        int j = rand() % i;
-        int temp = ord[i];
-        ord[i] = ord[j];
-        ord[j] = temp;
-    }
+#include "bots/randomBot.h"
 
-    for (int i = 0; i < numSpaces; i++) {
-        for (int j = 0; j < numSpaces; j++) {
-            if (makeMove(ord[i], ord[j])) {
-                return;
-            }
-        }
+void playerMove();
+
+void gameLoop() {
+    if (turn % 2) {
+        playerMove();
+    } else {
+        randomMove();
     }
 }
 
@@ -110,7 +79,7 @@ struct Vector2 getPos(int row, int col) {
 
 int cursor = -1;
 
-void playerTurn() {
+void playerMove() {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         int selected = -1;
         for (int i = 0; i < numSpaces; i++) {
@@ -148,14 +117,9 @@ void playerTurn() {
 }
 
 void drawBoard() {
+    gameLoop();
+
     ClearBackground(RAYWHITE);
-
-    if (turn % 2) {
-        playerTurn();
-    } else {
-        cpuTurn();
-    }
-
     DrawCircleV(boardCenter, boardRadius, BEIGE);
 
     for (int i = 0; i < numSpaces; i++) {
@@ -171,7 +135,6 @@ void drawBoard() {
 
 int main(void) {
     InitWindow(screenWidth, screenHeight, "Tiaoqi Tools");
-
     SetTargetFPS(60);
 
     initBoard();
@@ -185,6 +148,5 @@ int main(void) {
     }
 
     CloseWindow();
-
     return 0;
 }
