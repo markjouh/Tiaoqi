@@ -6,6 +6,10 @@ const int numCenter = 61;
 
 const int deltaX[6] = {-1, -1, 0, 1, 1, 0}, deltaY[6] = {0, 1, 1, 0, -1, -1};
 
+struct Coord {
+    int x, y;
+};
+
 const struct Coord spaces[numSpaces] = {
     {0, 12},
     {1, 11}, {1, 12},

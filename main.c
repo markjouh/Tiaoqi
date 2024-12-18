@@ -4,10 +4,6 @@
 #include <string.h>
 #include <raylib.h>
 
-struct Coord {
-    int x, y;
-};
-
 #include "board.h"
 
 int board[width][width];
