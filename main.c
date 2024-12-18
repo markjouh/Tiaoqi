@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -37,6 +38,28 @@ bool myPiece(int pos) {
     return board[spaces[pos].x][spaces[pos].y] == playerColors[turn % players];
 }
 
+bool makeMove(int a, int b) {
+    assert(a >= 0 && a < numSpaces);
+    assert(b >= 0 && b < numSpaces);
+
+    if (!myPiece(a) || a == b) {
+        return false;
+    }
+
+    findReachable(a);
+    if (!reachable[spaces[b].x][spaces[b].y]) {
+        return false;
+    }
+    clearReachable();
+
+    board[spaces[b].x][spaces[b].y] = board[spaces[a].x][spaces[a].y];
+    board[spaces[a].x][spaces[a].y] = -1;
+
+    turn++;
+
+    return true;
+}
+
 void cpuTurn() {
     int ord[numSpaces];
     for (int i = 0; i < numSpaces; i++) {
@@ -51,20 +74,9 @@ void cpuTurn() {
     }
 
     for (int i = 0; i < numSpaces; i++) {
-        if (myPiece(ord[i])) {
-            clearReachable();
-            findReachable(ord[i]);
-
-            for (int j = 0; j < numSpaces; j++) {
-                if (ord[i] != ord[j] && reachable[spaces[ord[j]].x][spaces[ord[j]].y]) {
-                    board[spaces[ord[j]].x][spaces[ord[j]].y] = board[spaces[ord[i]].x][spaces[ord[i]].y];
-                    board[spaces[ord[i]].x][spaces[ord[i]].y] = -1;
-
-                    clearReachable();
-                    turn++;
-
-                    return;
-                }
+        for (int j = 0; j < numSpaces; j++) {
+            if (makeMove(ord[i], ord[j])) {
+                return;
             }
         }
     }
@@ -118,10 +130,9 @@ void playerTurn() {
             }
 
             cursor = selected;
-            clearReachable();
             findReachable(cursor);
         } else {
-            if (!checkFree(spaces[selected].x, spaces[selected].y)) {
+            if (selected == cursor || !reachable[spaces[selected].x][spaces[selected].y]) {
                 return;
             }
             
@@ -153,7 +164,7 @@ void drawBoard() {
         DrawCircleV(p, pieceRadius, colors[1 + board[spaces[i].x][spaces[i].y]]);
 
         if (i != cursor && reachable[spaces[i].x][spaces[i].y]) {
-            DrawCircleV(p, 5, darkTint);
+            DrawCircleV(p, pieceRadius / 2, darkTint);
         }
     }
 }
