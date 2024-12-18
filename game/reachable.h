@@ -11,6 +11,10 @@ void dfsReachable(int u) {
             dist++;
         }
 
+        if (v == -1) {
+            continue;
+        }
+
         bool ok = true;
         for (int j = 0; j < dist; j++) {
             v = graph[v][i];

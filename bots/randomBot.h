@@ -1,5 +1,6 @@
 void randomMove() {
-    srand(time(0));
+    srand(time(NULL));
+
     while (true) {
         if (makeMove(rand() % numSpaces, rand() % numSpaces)) {
             return;

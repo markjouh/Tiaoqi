@@ -12,6 +12,7 @@ const int players = 2;
 const int playerColors[players] = {0, 3};
 
 int turn = 0;
+bool over = false;
 
 int myColor() {
     return playerColors[turn % players];
@@ -21,20 +22,25 @@ bool myPiece(int pos) {
     return board[pos] == myColor();
 }
 
-bool makeMove(int a, int b) {
-    assert(a >= 0 && a < numSpaces);
-    assert(b >= 0 && b < numSpaces);
-
-    if (!myPiece(a) || a == b) {
+bool validMove(int a, int b) {
+    if (a < 0 || a >= numSpaces || b < 0 || b >= numSpaces || a == b || !myPiece(a)) {
         return false;
     }
 
     clearReachable();
     findReachable(a);
-    if (!reachable[b]) {
+
+    const bool ok = reachable[b];
+
+    clearReachable();
+
+    return ok;
+}
+
+bool makeMove(int a, int b) {
+    if (!validMove(a, b)) {
         return false;
     }
-    clearReachable();
 
     board[b] = board[a];
     board[a] = -1;
@@ -45,14 +51,25 @@ bool makeMove(int a, int b) {
 }
 
 #include "bots/randomBot.h"
+#include "bots/basicBot.h"
 
 void playerMove();
 
 void gameLoop() {
     if (turn % 2) {
-        randomMove();
+        basicMove();
     } else {
         playerMove();
+    }
+
+    int scores[6];
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 10; j++) {
+            scores[i] += board[corners[(i + 3) % 6][j]] == i;
+        }
+        if (scores[i] == 10) {
+            over = true;
+        }
     }
 }
 
@@ -101,19 +118,13 @@ void playerMove() {
             }
 
             cursor = selected;
+            clearReachable();
             findReachable(cursor);
         } else {
-            if (selected == cursor || !reachable[selected]) {
-                return;
-            }
-            
-            board[selected] = board[cursor];
-            board[cursor] = -1;
+            makeMove(cursor, selected);
 
             cursor = -1;
             clearReachable();
-
-            turn++;
         }
     }
 }
