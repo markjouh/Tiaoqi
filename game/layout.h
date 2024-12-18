@@ -1,3 +1,5 @@
+#pragma once
+
 const int numSpaces = 121;
 const int numCenter = 61;
 
@@ -159,20 +161,3 @@ const int corners[6][10] = {
     {65, 75, 76, 86, 87, 88, 98, 99, 100, 101},
     {10, 11, 12, 13, 23, 24, 25, 35, 36, 46}
 };
-
-int board[numSpaces];
-
-void initBoard() {
-    for (int i = 0; i < numCenter; i++) {
-        board[center[i]] = -1;
-    }
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 10; j++) {
-            board[corners[i][j]] = i;
-        }
-    }
-}
-
-bool checkFree(int x) {
-    return x >= 0 && x < numSpaces && board[x] == -1;
-}

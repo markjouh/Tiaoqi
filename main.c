@@ -5,50 +5,7 @@
 #include <string.h>
 #include <raylib.h>
 
-#include "game/board.h"
-#include "game/reachable.h"
-
-const int players = 2;
-const int playerColors[players] = {0, 3};
-
-int turn = 0;
-bool over = false;
-
-int myColor() {
-    return playerColors[turn % players];
-}
-
-bool myPiece(int pos) {
-    return board[pos] == myColor();
-}
-
-bool validMove(int a, int b) {
-    if (a < 0 || a >= numSpaces || b < 0 || b >= numSpaces || a == b || !myPiece(a)) {
-        return false;
-    }
-
-    clearReachable();
-    findReachable(a);
-
-    const bool ok = reachable[b];
-
-    clearReachable();
-
-    return ok;
-}
-
-bool makeMove(int a, int b) {
-    if (!validMove(a, b)) {
-        return false;
-    }
-
-    board[b] = board[a];
-    board[a] = -1;
-
-    turn++;
-
-    return true;
-}
+#include "game/game.h"
 
 #include "bots/randomBot.h"
 #include "bots/basicBot.h"
@@ -56,21 +13,14 @@ bool makeMove(int a, int b) {
 void playerMove();
 
 void gameLoop() {
-    if (turn % 2) {
-        basicMove();
-    } else {
-        playerMove();
-    }
+    playerFuncs[turn % players]();
 
-    int scores[6];
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 10; j++) {
-            scores[i] += board[corners[(i + 3) % 6][j]] == i;
-        }
-        if (scores[i] == 10) {
-            over = true;
-        }
-    }
+    // int scores[6];
+    // for (int i = 0; i < 6; i++) {
+    //     for (int j = 0; j < 10; j++) {
+    //         scores[i] += board[corners[(i + 3) % 6][j]] == i;
+    //     }
+    // }
 }
 
 const int screenWidth = 1024;
@@ -96,9 +46,11 @@ struct Vector2 getPos(int row, int col) {
     return p;
 }
 
-int cursor = -1;
+bool playerMoves[numSpaces];
 
 void playerMove() {
+    static int cursor = -1;
+
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         int selected = -1;
         for (int i = 0; i < numSpaces; i++) {
@@ -113,18 +65,17 @@ void playerMove() {
         }
 
         if (cursor == -1) {
-            if (!myPiece(selected)) {
+            if (!chkMine(selected)) {
                 return;
             }
 
             cursor = selected;
-            clearReachable();
-            findReachable(cursor);
+            calcReachable(cursor, playerMoves);
         } else {
             makeMove(cursor, selected);
 
             cursor = -1;
-            clearReachable();
+            memset(playerMoves, 0, sizeof playerMoves);
         }
     }
 }
@@ -140,7 +91,7 @@ void drawBoard() {
 
         DrawCircleV(p, pieceRadius, colors[1 + board[i]]);
 
-        if (i != cursor && reachable[i]) {
+        if (playerMoves[i]) {
             DrawCircleV(p, pieceRadius / 2, darkTint);
         }
     }
@@ -150,7 +101,11 @@ int main(void) {
     InitWindow(screenWidth, screenHeight, "Tiaoqi Tools");
     SetTargetFPS(60);
 
-    initBoard();
+    initGame();
+    addPlayer(playerMove);
+    addPlayer(basicMove);
+    addPlayer(randomMove);
+    addPlayer(randomMove);
 
     while (!WindowShouldClose()) {
         BeginDrawing();

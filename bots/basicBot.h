@@ -4,6 +4,7 @@ int basicDist[numSpaces];
 
 void basicMove() {
     static bool init = false;
+    
     if (!init) {
         const int oppColor = (myColor() + 3) % 6;
 
