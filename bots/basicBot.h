@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "../game/absDist.h"
 
 int basicDist[numSpaces];

@@ -1,5 +1,11 @@
 #pragma once
 
+#include <stdbool.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "layout.h"
 
 typedef void (*FuncPtr)(void);
@@ -120,4 +126,15 @@ bool makeMove(int a, int b) {
     turn++;
 
     return true;
+}
+
+void gameLoop() {
+    playerFuncs[turn % players]();
+
+    // int scores[6];
+    // for (int i = 0; i < 6; i++) {
+    //     for (int j = 0; j < 10; j++) {
+    //         scores[i] += board[corners[(i + 3) % 6][j]] == i;
+    //     }
+    // }
 }

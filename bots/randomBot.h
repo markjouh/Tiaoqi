@@ -1,3 +1,5 @@
+#include <time.h>
+
 void randomMove() {
     srand(time(NULL));
 
