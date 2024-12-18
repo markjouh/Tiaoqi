@@ -76,6 +76,7 @@ const int screenHeight = 768;
 const double displayUnit = 40.0f;
 const double pieceRadius = 0.44f * displayUnit;
 const double boardRadius = 8.0f * displayUnit;
+const struct Vector2 boardCenter = {0.35f * screenWidth, 0.5f * screenHeight};
 
 const double triangleHeight = 0.86602540378f;
 
@@ -90,8 +91,8 @@ struct Vector2 getPos(int row, int col) {
     col -= offset;
 
     struct Vector2 p;
-    p.x = boardRadius + displayUnit * (col + 0.5f * row);
-    p.y = boardRadius + displayUnit * triangleHeight * row;
+    p.x = boardCenter.x + displayUnit * (col + 0.5f * row);
+    p.y = boardCenter.y + displayUnit * triangleHeight * row;
     return p;
 }
 
@@ -144,7 +145,6 @@ void drawBoard() {
         cpuTurn();
     }
 
-    const struct Vector2 boardCenter = {boardRadius, boardRadius};
     DrawCircleV(boardCenter, boardRadius, BEIGE);
 
     for (int i = 0; i < numSpaces; i++) {
