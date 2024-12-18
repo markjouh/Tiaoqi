@@ -13,8 +13,12 @@ const int playerColors[players] = {0, 3};
 
 int turn = 0;
 
+int myColor() {
+    return playerColors[turn % players];
+}
+
 bool myPiece(int pos) {
-    return board[spaces[pos].x][spaces[pos].y] == playerColors[turn % players];
+    return board[pos] == myColor();
 }
 
 bool makeMove(int a, int b) {
@@ -25,14 +29,15 @@ bool makeMove(int a, int b) {
         return false;
     }
 
+    clearReachable();
     findReachable(a);
-    if (!reachable[spaces[b].x][spaces[b].y]) {
+    if (!reachable[b]) {
         return false;
     }
     clearReachable();
 
-    board[spaces[b].x][spaces[b].y] = board[spaces[a].x][spaces[a].y];
-    board[spaces[a].x][spaces[a].y] = -1;
+    board[b] = board[a];
+    board[a] = -1;
 
     turn++;
 
@@ -45,9 +50,9 @@ void playerMove();
 
 void gameLoop() {
     if (turn % 2) {
-        playerMove();
-    } else {
         randomMove();
+    } else {
+        playerMove();
     }
 }
 
@@ -101,12 +106,12 @@ void playerMove() {
             cursor = selected;
             findReachable(cursor);
         } else {
-            if (selected == cursor || !reachable[spaces[selected].x][spaces[selected].y]) {
+            if (selected == cursor || !reachable[selected]) {
                 return;
             }
             
-            board[spaces[selected].x][spaces[selected].y] = board[spaces[cursor].x][spaces[cursor].y];
-            board[spaces[cursor].x][spaces[cursor].y] = -1;
+            board[selected] = board[cursor];
+            board[cursor] = -1;
 
             cursor = -1;
             clearReachable();
@@ -125,9 +130,9 @@ void drawBoard() {
     for (int i = 0; i < numSpaces; i++) {
         const struct Vector2 p = getPos(spaces[i].x, spaces[i].y);
 
-        DrawCircleV(p, pieceRadius, colors[1 + board[spaces[i].x][spaces[i].y]]);
+        DrawCircleV(p, pieceRadius, colors[1 + board[i]]);
 
-        if (i != cursor && reachable[spaces[i].x][spaces[i].y]) {
+        if (i != cursor && reachable[i]) {
             DrawCircleV(p, pieceRadius / 2, darkTint);
         }
     }
