@@ -7,9 +7,10 @@
 int main() {
     initGame();
     addPlayer(playerMove);
-    addPlayer(basicMove);
-    addPlayer(randomMove);
-    addPlayer(randomMove);
+    addPlayer(playerMove);
+    // addPlayer(basicMove);
+    // addPlayer(randomMove);
+    // addPlayer(randomMove);
 
     runGame();
 }

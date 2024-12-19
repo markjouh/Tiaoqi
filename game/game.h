@@ -53,11 +53,9 @@ bool chkMine(int x) {
     return chkValid(x) && board[x] == myColor();
 }
 
-bool reachable[numSpaces];
+int reachFrom[numSpaces];
 
 void dfsReachable(int u) {
-    reachable[u] = true;
-
     for (int i = 0; i < 6; i++) {
         int v = u, dist = 0;
 
@@ -76,40 +74,43 @@ void dfsReachable(int u) {
             ok &= chkFree(v);
         }
 
-        if (ok && !reachable[v]) {
+        if (ok && reachFrom[v] == -1) {
+            reachFrom[v] = u;
             dfsReachable(v);
         }
     }
 }
 
-void calcReachable(int u, bool *arr) {
+void calcReachable(int u, int *arr) {
     const int origColor = board[u];
     board[u] = -1;
 
-    memset(reachable, 0, sizeof reachable);
-
-    // Long jumps
-    dfsReachable(u);
-    reachable[u] = false;
+    memset(reachFrom, -1, sizeof reachFrom);
 
     // Adjacent spaces
     for (int i = 0; i < 6; i++) {
         if (chkFree(graph[u][i])) {
-            reachable[graph[u][i]] = true;
+            reachFrom[graph[u][i]] = u;
         }
     }
 
-    memcpy(arr, reachable, sizeof reachable);
+    // Long jumps
+    dfsReachable(u);
+
+    // Require a move
+    reachFrom[u] = -1;
+
+    memcpy(arr, reachFrom, sizeof reachFrom);
 
     board[u] = origColor;
 }
 
 bool validMove(int a, int b) {
     if (chkMine(a) && chkFree(b)) {
-        bool ok[numSpaces];
-        calcReachable(a, ok);
+        int from[numSpaces];
+        calcReachable(a, from);
 
-        return ok[b];
+        return from[b] != -1;
     }
 
     return false;
@@ -130,11 +131,4 @@ bool makeMove(int a, int b) {
 
 void gameLoop() {
     playerFuncs[turn % players]();
-
-    // int scores[6];
-    // for (int i = 0; i < 6; i++) {
-    //     for (int j = 0; j < 10; j++) {
-    //         scores[i] += board[corners[(i + 3) % 6][j]] == i;
-    //     }
-    // }
 }
