@@ -24,11 +24,10 @@ static void drawFilledArrowhead(Vector2 end, Vector2 dir, float size, Color colo
     DrawTriangle(p1, p2, p3, color);
 }
 
-void drawDirectedArc(Vector2 start, Vector2 end) {
+void drawDirectedArc(Vector2 start, Vector2 end, Color color) {
     int segments = 50;
     float thickness = 2.5f;
     float arrowSize = 12.0f;
-    Color color = darkTint;
     
     Vector2 direction = (Vector2){
         end.x - start.x,

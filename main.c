@@ -3,14 +3,13 @@
 
 #include "bots/randomBot.h"
 #include "bots/basicBot.h"
+#include "bots/comboBot.h"
 
 int main() {
     initGame();
-    addPlayer(playerMove);
-    addPlayer(playerMove);
+    // addPlayer(comboMove);
     // addPlayer(basicMove);
-    // addPlayer(randomMove);
-    // addPlayer(randomMove);
-
+    addPlayer(comboMove);
+    addPlayer(playerMove);
     runGame();
 }

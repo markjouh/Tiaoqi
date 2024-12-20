@@ -10,11 +10,15 @@
 
 typedef void (*FuncPtr)(void);
 
+// Basic game setup
+
 int board[numSpaces];
 
 int players, turn;
 int playerColor[6];
 FuncPtr playerFuncs[6];
+
+int finishedPlayers;
 
 void initGame() {
     for (int i = 0; i < numCenter; i++) {
@@ -31,6 +35,8 @@ void initGame() {
         playerColor[2 * i] = i;
         playerColor[2 * i + 1] = i + 3;
     }
+
+    finishedPlayers = 0;
 }
 
 void addPlayer(FuncPtr func) {
@@ -53,7 +59,9 @@ bool chkMine(int x) {
     return chkValid(x) && board[x] == myColor();
 }
 
-int reachFrom[numSpaces];
+// Jump pathing
+
+int from[numSpaces];
 
 void dfsReachable(int u) {
     for (int i = 0; i < 6; i++) {
@@ -74,23 +82,23 @@ void dfsReachable(int u) {
             ok &= chkFree(v);
         }
 
-        if (ok && reachFrom[v] == -1) {
-            reachFrom[v] = u;
+        if (ok && from[v] == -1) {
+            from[v] = u;
             dfsReachable(v);
         }
     }
 }
 
-void calcReachable(int u, int *arr) {
+void calcReachable(int u) {
     const int origColor = board[u];
     board[u] = -1;
 
-    memset(reachFrom, -1, sizeof reachFrom);
+    memset(from, -1, sizeof from);
 
     // Adjacent spaces
     for (int i = 0; i < 6; i++) {
         if (chkFree(graph[u][i])) {
-            reachFrom[graph[u][i]] = u;
+            from[graph[u][i]] = u;
         }
     }
 
@@ -98,23 +106,26 @@ void calcReachable(int u, int *arr) {
     dfsReachable(u);
 
     // Require a move
-    reachFrom[u] = -1;
-
-    memcpy(arr, reachFrom, sizeof reachFrom);
+    from[u] = -1;
 
     board[u] = origColor;
 }
 
+void getReachable(int u, int *arr) {
+    calcReachable(u);
+    memcpy(arr, from, sizeof from);
+}
+
 bool validMove(int a, int b) {
     if (chkMine(a) && chkFree(b)) {
-        int from[numSpaces];
-        calcReachable(a, from);
-
+        calcReachable(a);
         return from[b] != -1;
     }
 
     return false;
 }
+
+// Try to make a move, consuming your turn if valid
 
 bool makeMove(int a, int b) {
     if (!validMove(a, b)) {
@@ -129,6 +140,68 @@ bool makeMove(int a, int b) {
     return true;
 }
 
+// Make a hypothetical move, so we can use built-in helpers when testing possible future states
+
+const int maxHypDepth = 100;
+
+int hypMoves[maxHypDepth][2];
+int hypIdx = 0;
+
+bool makeHypMove(int a, int b) {
+    if (!validMove(a, b)) {
+        return false;
+    }
+
+    board[b] = board[a];
+    board[a] = -1;
+
+    hypMoves[hypIdx][0] = a;
+    hypMoves[hypIdx][1] = b;
+    hypIdx++;
+
+    return true;
+}
+
+void undoHypMove() {
+    hypIdx--;
+    const int a = hypMoves[hypIdx][0], b = hypMoves[hypIdx][1];
+    board[a] = board[b];
+    board[b] = -1;
+}
+
+const int maxTurns = 100;
+
+int getScore(int x) {
+    int score = 0;
+    for (int i = 0; i < 10; i++) {
+        score -= 2 * board[corners[x][i]] == x;
+        score += board[corners[(x + 3) % 6][i]] == x;
+    }
+    return score;
+}
+
+bool gameFinished() {
+    return finishedPlayers == players;
+}
+
 void gameLoop() {
+    if (gameFinished()) {
+        return;
+    }
+    
+    if (getScore(myColor()) == 10) {
+        turn++;
+        return;
+    }
+
     playerFuncs[turn % players]();
+
+    finishedPlayers += getScore(myColor()) == 10;
+    if (turn >= maxTurns) {
+        finishedPlayers = players;
+    }
+
+    while (hypIdx > 0) {
+        undoHypMove();
+    }
 }

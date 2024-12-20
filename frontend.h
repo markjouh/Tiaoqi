@@ -6,17 +6,20 @@
 #include <stdbool.h>
 #include <math.h>
 
-const int screenWidth = 1024;
-const int screenHeight = 768;
+const int screenWidth = 1920;
+const int screenHeight = 1080;
 
-const double displayUnit = 40.0f;
+const double displayUnit = 50.0f;
 const double pieceRadius = 0.44f * displayUnit;
 const double boardRadius = 8.0f * displayUnit;
-const struct Vector2 boardCenter = {0.35f * screenWidth, 0.5f * screenHeight};
+const double boardGap = (screenHeight - 2 * boardRadius) / 2;
+const struct Vector2 boardCenter = {screenWidth / 2, screenHeight / 2};
 
 const double triangleHeight = 0.86602540378f;
 
-const struct Color darkTint = {0, 0, 0, 90};
+struct Color darkTint(float opacity) {
+    return (struct Color) {0, 0, 0, opacity * 255};
+}
 
 const struct Color colors[7] = {
     BROWN, MAROON, BLACK, DARKBLUE, DARKGREEN, WHITE, GOLD
@@ -53,7 +56,7 @@ void playerMove() {
             }
 
             selected = cursor;
-            calcReachable(selected, playerFrom);
+            getReachable(selected, playerFrom);
         } else {
             makeMove(selected, cursor);
 
@@ -68,13 +71,15 @@ void playerMove() {
 void drawBoard() {
     ClearBackground(RAYWHITE);
     DrawCircleV(boardCenter, boardRadius, BEIGE);
+    DrawRing(boardCenter, boardRadius - 2, boardRadius + 2, 0, 360, 100, BEIGE);
 
     // Board state
     for (int i = 0; i < numSpaces; i++) {
+        
         DrawCircleV(getPos(i), pieceRadius, colors[1 + board[i]]);
 
         if (playerFrom[i] != -1) {
-            DrawCircleV(getPos(i), pieceRadius / 2, darkTint);
+            DrawCircleV(getPos(i), pieceRadius / 2, darkTint(0.4));
         }
     }
 
@@ -90,7 +95,7 @@ void drawBoard() {
         }
 
         for (int i = idx - 2; i >= 0; i--) {
-            drawDirectedArc(getPos(buf[i + 1]), getPos(buf[i]));
+            drawDirectedArc(getPos(buf[i + 1]), getPos(buf[i]), darkTint(0.5));
 
             const int num = idx - 1 - i;
             char s[50];

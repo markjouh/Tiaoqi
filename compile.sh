@@ -1,1 +1,1 @@
-eval cc main.c $(pkg-config --libs --cflags raylib)
+eval cc main.c $(pkg-config --libs --cflags raylib) -O3
