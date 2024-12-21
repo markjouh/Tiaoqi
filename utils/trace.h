@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-void printArray(const int *arr, int n) {
+void trace_array(const int *arr, int n) {
     printf("{");
     for (int i = 0; i < n; i++) {
         if (i > 0) {
@@ -14,13 +14,13 @@ void printArray(const int *arr, int n) {
     printf("}");
 }
 
-void printArray2d(const int *arr, int n, int m) {
+void trace_array2d(const int *arr, int n, int m) {
     printf("{\n");
     for (int i = 0; i < n; i++) {
         if (i > 0) {
             printf(",\n");
         }
-        printArray(arr + i * m, m);
+        trace_array(arr + i * m, m);
     }
     printf("\n}");
 }

@@ -1,30 +1,30 @@
 #pragma once
 
-const int queueSz = 300;
+#define QUEUE_SZ 300
 
-int queue[2 * queueSz];
-int queueL, queueR;
+int queue[2 * QUEUE_SZ];
+int queue_l, queue_r;
 
-void clearQueue() {
-    queueL = queueSz;
-    queueR = queueSz - 1;
+void queue_clear() {
+    queue_l = QUEUE_SZ;
+    queue_r = QUEUE_SZ - 1;
 }
 
-bool queueEmpty() {
-    return queueL > queueR;
+bool queue_empty() {
+    return queue_l > queue_r;
 }
 
-int queuePop() {
-    assert(!queueEmpty());
-    return queue[queueL++];
+int queue_pop() {
+    assert(!queue_empty());
+    return queue[queue_l++];
 }
 
-void pushFront(int x) {
-    assert(queueL > 0);
-    queue[--queueL] = x;
+void queue_pf(int x) {
+    assert(queue_l > 0);
+    queue[--queue_l] = x;
 }
 
-void pushBack(int x) {
-    assert(queueR < 2 * queueSz - 1);
-    queue[++queueR] = x;
+void queue_pb(int x) {
+    assert(queue_r < 2 * QUEUE_SZ - 1);
+    queue[++queue_r] = x;
 }

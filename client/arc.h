@@ -1,6 +1,6 @@
 #pragma once
 
-static Vector2 getQuadraticBezierPoint(float t, Vector2 p0, Vector2 p1, Vector2 p2) {
+static Vector2 quadratic_bezier(float t, Vector2 p0, Vector2 p1, Vector2 p2) {
     float u = 1.0f - t;
     float tt = t * t;
     float uu = u * u;
@@ -10,7 +10,7 @@ static Vector2 getQuadraticBezierPoint(float t, Vector2 p0, Vector2 p1, Vector2 
     };
 }
 
-static void drawFilledArrowhead(Vector2 end, Vector2 dir, float size, Color color) {
+static void draw_arrowhead(Vector2 end, Vector2 dir, float size, Color color) {
     float angle = atan2f(dir.y, dir.x);
     Vector2 p1 = end;
     Vector2 p2 = (Vector2){
@@ -24,10 +24,10 @@ static void drawFilledArrowhead(Vector2 end, Vector2 dir, float size, Color colo
     DrawTriangle(p1, p2, p3, color);
 }
 
-void drawDirectedArc(Vector2 start, Vector2 end, Color color) {
+void draw_arc(Vector2 start, Vector2 end, Color color) {
     int segments = 50;
-    float thickness = 2.5f;
-    float arrowSize = 12.0f;
+    float line_width = 2.5f;
+    float arrow_size = 12.0f;
     
     Vector2 direction = (Vector2){
         end.x - start.x,
@@ -46,17 +46,17 @@ void drawDirectedArc(Vector2 start, Vector2 end, Color color) {
         ((start.y + end.y) / 2.0f) - dist
     };
 
-    Vector2 prev = getQuadraticBezierPoint(0.0f, start, control, end);
+    Vector2 prev = quadratic_bezier(0.0f, start, control, end);
     for(int i = 1; i <= segments; i++) {
         float t = (float)i / segments;
-        Vector2 current = getQuadraticBezierPoint(t, start, control, end);
-        DrawLineEx(prev, current, thickness, color);
+        Vector2 current = quadratic_bezier(t, start, control, end);
+        DrawLineEx(prev, current, line_width, color);
         prev = current;
     }
 
-    Vector2 directionToEnd = (Vector2){
+    Vector2 head_angle = (Vector2){
         end.x - control.x,
         end.y - control.y
     };
-    drawFilledArrowhead(end, directionToEnd, arrowSize, color);
+    draw_arrowhead(end, head_angle, arrow_size, color);
 }

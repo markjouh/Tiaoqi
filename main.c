@@ -1,15 +1,13 @@
 #include "game/game.h"
-#include "frontend.h"
+#include "client/client.h"
 
-#include "bots/randomBot.h"
-#include "bots/basicBot.h"
-#include "bots/comboBot.h"
+#include "bots/random.h"
+#include "bots/basic.h"
+#include "bots/combo.h"
 
 int main() {
-    initGame();
-    // addPlayer(comboMove);
-    // addPlayer(basicMove);
-    addPlayer(comboMove);
-    addPlayer(playerMove);
-    runGame();
+    game_init();
+    game_add(combo_move);
+    game_add(player_move);
+    game_run();
 }

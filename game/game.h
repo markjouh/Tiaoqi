@@ -12,16 +12,14 @@ typedef void (*FuncPtr)(void);
 
 // Basic game setup
 
-int board[numSpaces];
+int board[SPACES];
 
-int players, turn;
-int playerColor[6];
-FuncPtr playerFuncs[6];
+int players, players_finished, turn;
+int player_color[6];
+FuncPtr player_func[6];
 
-int finishedPlayers;
-
-void initGame() {
-    for (int i = 0; i < numCenter; i++) {
+void game_init() {
+    for (int i = 0; i < CENTER; i++) {
         board[center[i]] = -1;
     }
     for (int i = 0; i < 6; i++) {
@@ -30,44 +28,42 @@ void initGame() {
         }
     }
 
-    players = turn = 0;
+    players = players_finished = turn = 0;
     for (int i = 0; i < 3; i++) {
-        playerColor[2 * i] = i;
-        playerColor[2 * i + 1] = i + 3;
+        player_color[2 * i] = i;
+        player_color[2 * i + 1] = i + 3;
     }
-
-    finishedPlayers = 0;
 }
 
-void addPlayer(FuncPtr func) {
-    playerFuncs[players++] = func;
+void game_add(FuncPtr func) {
+    player_func[players++] = func;
 }
 
-int myColor() {
-    return playerColor[turn % players];
+int my_color() {
+    return player_color[turn % players];
 }
 
-bool chkValid(int x) {
-    return x >= 0 && x < numSpaces;
+bool space_valid(int x) {
+    return x >= 0 && x < SPACES;
 }
 
-bool chkFree(int x) {
-    return chkValid(x) && board[x] == -1;
+bool space_free(int x) {
+    return space_valid(x) && board[x] == -1;
 }
 
-bool chkMine(int x) {
-    return chkValid(x) && board[x] == myColor();
+bool space_mine(int x) {
+    return space_valid(x) && board[x] == my_color();
 }
 
 // Jump pathing
 
-int from[numSpaces];
+int from[SPACES];
 
-void dfsReachable(int u) {
+void reachable_dfs(int u) {
     for (int i = 0; i < 6; i++) {
         int v = u, dist = 0;
 
-        while (chkFree(v)) {
+        while (space_free(v)) {
             v = graph[v][i];
             dist++;
         }
@@ -79,46 +75,46 @@ void dfsReachable(int u) {
         bool ok = true;
         for (int j = 0; j < dist; j++) {
             v = graph[v][i];
-            ok &= chkFree(v);
+            ok &= space_free(v);
         }
 
         if (ok && from[v] == -1) {
             from[v] = u;
-            dfsReachable(v);
+            reachable_dfs(v);
         }
     }
 }
 
-void calcReachable(int u) {
-    const int origColor = board[u];
+void reachable_calc(int u) {
+    const int old = board[u];
     board[u] = -1;
 
     memset(from, -1, sizeof from);
 
     // Adjacent spaces
     for (int i = 0; i < 6; i++) {
-        if (chkFree(graph[u][i])) {
+        if (space_free(graph[u][i])) {
             from[graph[u][i]] = u;
         }
     }
 
     // Long jumps
-    dfsReachable(u);
+    reachable_dfs(u);
 
     // Require a move
     from[u] = -1;
 
-    board[u] = origColor;
+    board[u] = old;
 }
 
-void getReachable(int u, int *arr) {
-    calcReachable(u);
+void reachable_copy(int u, int *arr) {
+    reachable_calc(u);
     memcpy(arr, from, sizeof from);
 }
 
-bool validMove(int a, int b) {
-    if (chkMine(a) && chkFree(b)) {
-        calcReachable(a);
+bool move_valid(int a, int b) {
+    if (space_mine(a) && space_free(b)) {
+        reachable_calc(a);
         return from[b] != -1;
     }
 
@@ -127,8 +123,8 @@ bool validMove(int a, int b) {
 
 // Try to make a move, consuming your turn if valid
 
-bool makeMove(int a, int b) {
-    if (!validMove(a, b)) {
+bool move(int a, int b) {
+    if (!move_valid(a, b)) {
         return false;
     }
 
@@ -142,36 +138,36 @@ bool makeMove(int a, int b) {
 
 // Make a hypothetical move, so we can use built-in helpers when testing possible future states
 
-const int maxHypDepth = 100;
+#define MX_HYPMOVES 100
 
-int hypMoves[maxHypDepth][2];
-int hypIdx = 0;
+int hypmoves[MX_HYPMOVES][2];
+int hypmove_idx = 0;
 
-bool makeHypMove(int a, int b) {
-    if (!validMove(a, b)) {
+bool hypmove(int a, int b) {
+    if (!move_valid(a, b)) {
         return false;
     }
 
     board[b] = board[a];
     board[a] = -1;
 
-    hypMoves[hypIdx][0] = a;
-    hypMoves[hypIdx][1] = b;
-    hypIdx++;
+    hypmoves[hypmove_idx][0] = a;
+    hypmoves[hypmove_idx][1] = b;
+    hypmove_idx++;
 
     return true;
 }
 
-void undoHypMove() {
-    hypIdx--;
-    const int a = hypMoves[hypIdx][0], b = hypMoves[hypIdx][1];
+void hypmove_undo() {
+    hypmove_idx--;
+    const int a = hypmoves[hypmove_idx][0], b = hypmoves[hypmove_idx][1];
     board[a] = board[b];
     board[b] = -1;
 }
 
-const int maxTurns = 100;
+#define MX_TURNS 100
 
-int getScore(int x) {
+int score(int x) {
     int score = 0;
     for (int i = 0; i < 10; i++) {
         score -= 2 * board[corners[x][i]] == x;
@@ -180,28 +176,28 @@ int getScore(int x) {
     return score;
 }
 
-bool gameFinished() {
-    return finishedPlayers == players;
+bool game_finished() {
+    return players_finished == players;
 }
 
-void gameLoop() {
-    if (gameFinished()) {
+void game_iter() {
+    if (game_finished()) {
         return;
     }
     
-    if (getScore(myColor()) == 10) {
+    if (score(my_color()) == 10) {
         turn++;
         return;
     }
 
-    playerFuncs[turn % players]();
+    player_func[turn % players]();
 
-    finishedPlayers += getScore(myColor()) == 10;
-    if (turn >= maxTurns) {
-        finishedPlayers = players;
+    players_finished += score(my_color()) == 10;
+    if (turn >= MX_TURNS) {
+        players_finished = players;
     }
 
-    while (hypIdx > 0) {
-        undoHypMove();
+    while (hypmove_idx > 0) {
+        hypmove_undo();
     }
 }

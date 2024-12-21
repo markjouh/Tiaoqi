@@ -3,11 +3,11 @@
 
 #include <time.h>
 
-void randomMove() {
+void random_move() {
     srand(time(NULL));
 
     while (true) {
-        if (makeMove(rand() % numSpaces, rand() % numSpaces)) {
+        if (move(rand() % SPACES, rand() % SPACES)) {
             return;
         }
     }

@@ -5,24 +5,24 @@
 
 #include "../game/dist.h"
 
-void basicMove() {
+void basic_move() {
     static bool init = false;
-    static int dist[numSpaces];
+    static int dist[SPACES];
     if (!init) {
-        getDists(vertices[(myColor() + 3) % 6], dist);
+        dist_copy(vertices[(my_color() + 3) % 6], dist);
         init = true;
     }
 
-    int minDelta = 100, a, b;
-    for (int i = 0; i < numSpaces; i++) {
-        for (int j = 0; j < numSpaces; j++) {
+    int min_delta = 100, a, b;
+    for (int i = 0; i < SPACES; i++) {
+        for (int j = 0; j < SPACES; j++) {
             const int delta = dist[j] - dist[i];
-            if (validMove(i, j) && delta < minDelta) {
-                minDelta = delta;
+            if (move_valid(i, j) && delta < min_delta) {
+                min_delta = delta;
                 a = i, b = j;
             }
         }
     }
-    assert(validMove(a, b));
-    makeMove(a, b);
+    assert(move_valid(a, b));
+    move(a, b);
 }

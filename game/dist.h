@@ -2,28 +2,28 @@
 
 #include "../utils/queue.h"
 
-int bufDist[numSpaces];
+int dist_buf[SPACES];
 
-void calcDists(int u) {
-    memset(bufDist, -1, sizeof bufDist);
-    clearQueue();
+void dist_calc(int u) {
+    memset(dist_buf, -1, sizeof dist_buf);
+    queue_clear();
 
-    bufDist[u] = 0;
-    pushBack(u);
+    dist_buf[u] = 0;
+    queue_pb(u);
 
-    while (!queueEmpty()) {
-        int u = queuePop();
+    while (!queue_empty()) {
+        int u = queue_pop();
         for (int i = 0; i < 6; i++) {
             const int v = graph[u][i];
-            if (v != -1 && bufDist[v] == -1) {
-                bufDist[v] = bufDist[u] + 1;
-                pushBack(v);
+            if (v != -1 && dist_buf[v] == -1) {
+                dist_buf[v] = dist_buf[u] + 1;
+                queue_pb(v);
             }
         }
     }
 }
 
-void getDists(int u, int *arr) {
-    calcDists(u);
-    memcpy(arr, bufDist, sizeof bufDist);
+void dist_copy(int u, int *arr) {
+    dist_calc(u);
+    memcpy(arr, dist_buf, sizeof dist_buf);
 }

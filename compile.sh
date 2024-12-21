@@ -1,1 +1,2 @@
-eval cc main.c $(pkg-config --libs --cflags raylib) -O3
+gcc-14 -O3 -std=c99 main.c -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+
