@@ -1,13 +1,13 @@
 #pragma once
 
-#define SPACES 121
-#define CENTER 61
+constexpr int SPACES = 121;
+constexpr int CENTER = 61;
 
 struct Coord {
     int x, y;
 };
 
-const struct Coord spaces[SPACES] = {
+constexpr struct Coord spaces[SPACES] = {
     {-8, 4},
     {-7, 3}, {-7, 4},
     {-6, 2}, {-6, 3}, {-6, 4},
@@ -27,9 +27,9 @@ const struct Coord spaces[SPACES] = {
     {8, -4}
 };
 
-const int center[CENTER] = {14, 15, 16, 17, 18, 26, 27, 28, 29, 30, 31, 37, 38, 39, 40, 41, 42, 43, 47, 48, 49, 50, 51, 52, 53, 54, 56, 57, 58, 59, 60, 61, 62, 63, 64, 66, 67, 68, 69, 70, 71, 72, 73, 77, 78, 79, 80, 81, 82, 83, 89, 90, 91, 92, 93, 94, 102, 103, 104, 105, 106};
+constexpr char center[CENTER] = {14, 15, 16, 17, 18, 26, 27, 28, 29, 30, 31, 37, 38, 39, 40, 41, 42, 43, 47, 48, 49, 50, 51, 52, 53, 54, 56, 57, 58, 59, 60, 61, 62, 63, 64, 66, 67, 68, 69, 70, 71, 72, 73, 77, 78, 79, 80, 81, 82, 83, 89, 90, 91, 92, 93, 94, 102, 103, 104, 105, 106};
 
-const int graph[SPACES][6] = {
+constexpr char graph[SPACES][6] = {
     {-1, -1, -1, 2, 1, -1},
     {-1, 0, 2, 4, 3, -1},
     {0, -1, -1, 5, 4, 1},
@@ -153,7 +153,7 @@ const int graph[SPACES][6] = {
     {118, 119, -1, -1, -1, -1}
 };
 
-const int corners[6][10] = {
+constexpr char corners[6][10] = {
     {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
     {19, 20, 21, 22, 32, 33, 34, 44, 45, 55},
     {74, 84, 85, 95, 96, 97, 107, 108, 109, 110},
@@ -162,6 +162,6 @@ const int corners[6][10] = {
     {10, 11, 12, 13, 23, 24, 25, 35, 36, 46}
 };
 
-const int vertices[6] = {
+constexpr char vertices[6] = {
     0, 22, 110, 120, 98, 10
 };

@@ -1,6 +1,6 @@
 #pragma once
 
-static Vector2 quadratic_bezier(float t, Vector2 p0, Vector2 p1, Vector2 p2) {
+struct Vector2 quadratic_bezier(float t, Vector2 p0, Vector2 p1, Vector2 p2) {
     float u = 1.0f - t;
     float tt = t * t;
     float uu = u * u;
@@ -10,7 +10,7 @@ static Vector2 quadratic_bezier(float t, Vector2 p0, Vector2 p1, Vector2 p2) {
     };
 }
 
-static void draw_arrowhead(Vector2 end, Vector2 dir, float size, Color color) {
+void draw_arrowhead(Vector2 end, Vector2 dir, float size, Color color) {
     float angle = atan2f(dir.y, dir.x);
     Vector2 p1 = end;
     Vector2 p2 = (Vector2){
